@@ -5,10 +5,11 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour {
 	public GameObject _bulletPrefab;
 	public RectTransform _canvasRt;
-	PlayerStats _playerStats;
+	public PlayerStats _playerStats;
 	RectTransform _playerRt;
 
 	List<GameObject> _listBullets;
+	List<GameObject> _poolBullets;
 
 	float _timeBulletFireChangeInterval;
 	float _timeStyleFireChangeLapse;
@@ -19,24 +20,43 @@ public class PlayerManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		_playerStats = ScriptableObject.CreateInstance<PlayerStats>();
-		print ("_playerStats = " + _playerStats);
 		print ("_playerStats.ID = " + _playerStats.ID);
 		print ("_playerStats.Heal = " + _playerStats.Heal);
 		print ("_playerStats.BulletPower = " + _playerStats.BulletPower);
 		print ("_playerStats.BulletSpeed = " + _playerStats.BulletSpeed);
+		print ("_playerStats.BulletSpeedMove = " + _playerStats.BulletSpeedMove);
 		print ("_playerStats.IsInvincible = " + _playerStats.IsInvincible);
 
 		_playerRt = GetComponent<RectTransform> ();
 		_listBullets = new List<GameObject> ();
+		_poolBullets = new List<GameObject> ();
 
 		_timeBulletFireChangeInterval = 5;
 		_changeBulletSide = -1;
+
 	}
 
+	GameObject GetFreeBullet () {
+		GameObject ret = null;
+		for (var i = 0; i < _poolBullets.Count; i++) {
+			if (!_poolBullets[i].activeInHierarchy) {
+				ret = _poolBullets [i];
+				break;
+			}
+		}
+		if (!ret) {
+			ret = (GameObject)Instantiate(_bulletPrefab);
+			_poolBullets.Add (ret);
+			ret.transform.SetParent(transform.parent);
+		}
+		return ret;
+	}
+
+
 	public IEnumerator Fire () {
-		GameObject bullet = (GameObject)Instantiate(_bulletPrefab);
-//		bullet.InitInfo ();
-		bullet.transform.SetParent(transform.parent);
+		GameObject bullet = GetFreeBullet ();
+		bullet.GetComponent<Bullet>().InitInfo (_playerStats.BulletSpeedMove);
+		bullet.SetActive(true);
 		bullet.GetComponent<RectTransform> ().position = new Vector2(_playerRt.position.x + _changeBulletSide * _playerStats.BulletStartRange,
 			_playerRt.position.y + _playerRt.sizeDelta.y / 2 - 20);
 		_changeBulletSide *= -1;
@@ -45,9 +65,9 @@ public class PlayerManager : MonoBehaviour {
 	}
 
 	public IEnumerator DoubleFire () {
-		GameObject bullet = (GameObject)Instantiate(_bulletPrefab);
-		//		bullet.InitInfo ();
-		bullet.transform.SetParent(transform.parent);
+		GameObject bullet = GetFreeBullet ();
+		bullet.GetComponent<Bullet>().InitInfo (_playerStats.BulletSpeedMove);
+		bullet.SetActive(true);
 		bullet.GetComponent<RectTransform> ().position = new Vector2(_playerRt.position.x + _changeBulletSide * _playerStats.BulletStartRange,
 			_playerRt.position.y + _playerRt.sizeDelta.y / 2 - 20);
 		_changeBulletSide *= -1;
@@ -56,9 +76,9 @@ public class PlayerManager : MonoBehaviour {
 	}
 
 	public IEnumerator TripleFire () {
-		GameObject bullet = (GameObject)Instantiate(_bulletPrefab);
-		//		bullet.InitInfo ();
-		bullet.transform.SetParent(transform.parent);
+		GameObject bullet = GetFreeBullet ();
+		bullet.GetComponent<Bullet>().InitInfo (_playerStats.BulletSpeedMove);
+		bullet.SetActive(true);
 		bullet.GetComponent<RectTransform> ().position = new Vector2(_playerRt.position.x + _changeBulletSide * _playerStats.BulletStartRange,
 			_playerRt.position.y + _playerRt.sizeDelta.y / 2 - 20);
 		_changeBulletSide *= -1;
@@ -68,7 +88,7 @@ public class PlayerManager : MonoBehaviour {
 
 	public void Move (float deltaX) {
 		var rectTranform = GetComponent<RectTransform> ();
-		rectTranform.localPosition = new Vector2 (rectTranform.localPosition.x + deltaX, rectTranform.localPosition.y);
+		rectTranform.localPosition = new Vector2 (rectTranform.localPosition.x + deltaX * 2, rectTranform.localPosition.y);
 		ClampToArea ();
 	}
 
@@ -90,8 +110,8 @@ public class PlayerManager : MonoBehaviour {
 		// update Fire state
 		FireUpdate(dt);
 
-		// Cheat change style fire
-		ChangeStyleBulletFire(dt);
+		// Cheat change fire type
+		ChangeStyleFire(dt);
 
 		// update bullets and check dead
 		List<GameObject> listDeadBullet = new List<GameObject>();
@@ -102,7 +122,7 @@ public class PlayerManager : MonoBehaviour {
 			}
 		}
 		foreach (var bullet in listDeadBullet) {
-			GameObject.Destroy (bullet);
+			bullet.SetActive(false);
 			_listBullets.Remove (bullet);
 		}
 	}
@@ -110,15 +130,15 @@ public class PlayerManager : MonoBehaviour {
 	void FireUpdate (float dt) {
 		_timeLapse += dt;
 		// fire with interval
-		if (_timeLapse >= _playerStats.BulletSpeed) {
-			switch (_playerStats.BulletFireType) {
-			case BulletFireStyle.Single:
+		if (_timeLapse >= _playerStats.BulletSpeed[(int)_playerStats.BulletSpeedLevel]) {
+			switch (_playerStats.FireType) {
+			case FireStyle.Single:
 				Fire ();
 				break;
-			case BulletFireStyle.Double:
+			case FireStyle.Double:
 				DoubleFire ();
 				break;
-			case BulletFireStyle.Triple:
+			case FireStyle.Triple:
 				TripleFire ();
 				break;
 			}
@@ -126,21 +146,21 @@ public class PlayerManager : MonoBehaviour {
 		}
 	}
 
-	void ChangeStyleBulletFire (float dt) {
+	void ChangeStyleFire (float dt) {
 		_timeStyleFireChangeLapse += dt;
 		if (_timeStyleFireChangeLapse >= _timeBulletFireChangeInterval) {
 			print ("Change Style Fire");
-			switch (_playerStats.BulletFireType) {
-			case BulletFireStyle.Single:
-				_playerStats.BulletFireType = BulletFireStyle.Double;
+			switch (_playerStats.FireType) {
+			case FireStyle.Single:
+				_playerStats.FireType = FireStyle.Double;
 				break;
 
-			case BulletFireStyle.Double:
-				_playerStats.BulletFireType = BulletFireStyle.Triple;
+			case FireStyle.Double:
+				_playerStats.FireType = FireStyle.Triple;
 				break;
 
-			case BulletFireStyle.Triple:
-				_playerStats.BulletFireType = BulletFireStyle.Single;
+			case FireStyle.Triple:
+				_playerStats.FireType = FireStyle.Single;
 				break;
 
 			}
