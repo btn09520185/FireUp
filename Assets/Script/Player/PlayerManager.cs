@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour {
 	public GameObject _bulletPrefab;
+	PlayerStats _playerStats;
 	public RectTransform _canvasRt;
-	public PlayerStats _playerStats;
 	RectTransform _playerRt;
 
 	List<GameObject> _listBullets;
@@ -19,34 +19,31 @@ public class PlayerManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		_playerStats = ScriptableObject.CreateInstance<PlayerStats>();
-		print ("_playerStats.ID = " + _playerStats.ID);
-		print ("_playerStats.Heal = " + _playerStats.Heal);
-		print ("_playerStats.BulletPower = " + _playerStats.BulletPower);
-		print ("_playerStats.BulletSpeed = " + _playerStats.BulletSpeed);
-		print ("_playerStats.BulletSpeedMove = " + _playerStats.BulletSpeedMove);
-		print ("_playerStats.IsInvincible = " + _playerStats.IsInvincible);
+		print ("PlayerManager Start");
 
-		_playerRt = GetComponent<RectTransform> ();
-		_listBullets = new List<GameObject> ();
-		_poolBullets = new List<GameObject> ();
+	}
 
-		_timeBulletFireChangeInterval = 5;
-		_changeBulletSide = -1;
+	void Awake () {
+		this._playerStats = ScriptableObject.CreateInstance<PlayerStats>();
+		this._playerRt = GetComponent<RectTransform> ();
+		this._listBullets = new List<GameObject> ();
+		this._poolBullets = new List<GameObject> ();
 
+		this._timeBulletFireChangeInterval = 5;
+		this._changeBulletSide = -1;
 	}
 
 	GameObject GetFreeBullet () {
 		GameObject ret = null;
-		for (var i = 0; i < _poolBullets.Count; i++) {
-			if (!_poolBullets[i].activeInHierarchy) {
-				ret = _poolBullets [i];
+		for (var i = 0; i < this._poolBullets.Count; i++) {
+			if (!this._poolBullets[i].activeInHierarchy) {
+				ret = this._poolBullets [i];
 				break;
 			}
 		}
 		if (!ret) {
-			ret = (GameObject)Instantiate(_bulletPrefab);
-			_poolBullets.Add (ret);
+			ret = (GameObject)Instantiate(this._bulletPrefab);
+			this._poolBullets.Add (ret);
 			ret.transform.SetParent(transform.parent);
 		}
 		return ret;
@@ -55,55 +52,82 @@ public class PlayerManager : MonoBehaviour {
 
 	public IEnumerator Fire () {
 		GameObject bullet = GetFreeBullet ();
-		bullet.GetComponent<Bullet>().InitInfo (_playerStats.BulletSpeedMove);
+		bullet.GetComponent<Bullet>().InitInfo (0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
 		bullet.SetActive(true);
-		bullet.GetComponent<RectTransform> ().position = new Vector2(_playerRt.position.x + _changeBulletSide * _playerStats.BulletStartRange,
-			_playerRt.position.y + _playerRt.sizeDelta.y / 2 - 20);
-		_changeBulletSide *= -1;
-		_listBullets.Add (bullet);
+		bullet.GetComponent<RectTransform> ().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+			this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+		this._changeBulletSide *= -1;
+		this._listBullets.Add (bullet);
 		return null;
 	}
 
 	public IEnumerator DoubleFire () {
 		GameObject bullet = GetFreeBullet ();
-		bullet.GetComponent<Bullet>().InitInfo (_playerStats.BulletSpeedMove);
+		bullet.GetComponent<Bullet>().InitInfo (0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
 		bullet.SetActive(true);
-		bullet.GetComponent<RectTransform> ().position = new Vector2(_playerRt.position.x + _changeBulletSide * _playerStats.BulletStartRange,
-			_playerRt.position.y + _playerRt.sizeDelta.y / 2 - 20);
-		_changeBulletSide *= -1;
-		_listBullets.Add (bullet);
+		bullet.GetComponent<RectTransform> ().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+			this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+		this._changeBulletSide *= -1;
+		this._listBullets.Add (bullet);
 		return null;
 	}
 
 	public IEnumerator TripleFire () {
 		GameObject bullet = GetFreeBullet ();
-		bullet.GetComponent<Bullet>().InitInfo (_playerStats.BulletSpeedMove);
+		bullet.GetComponent<Bullet>().InitInfo (0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
 		bullet.SetActive(true);
-		bullet.GetComponent<RectTransform> ().position = new Vector2(_playerRt.position.x + _changeBulletSide * _playerStats.BulletStartRange,
-			_playerRt.position.y + _playerRt.sizeDelta.y / 2 - 20);
-		_changeBulletSide *= -1;
-		_listBullets.Add (bullet);
+		bullet.GetComponent<RectTransform> ().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+			this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+		this._changeBulletSide *= -1;
+		this._listBullets.Add (bullet);
 		return null;
 	}
 
 	public void Move (float deltaX) {
-		var rectTranform = GetComponent<RectTransform> ();
-		rectTranform.localPosition = new Vector2 (rectTranform.localPosition.x + deltaX * 2, rectTranform.localPosition.y);
-		ClampToArea ();
+		this._playerRt.localPosition = new Vector2 (this._playerRt.localPosition.x + deltaX * 2, this._playerRt.localPosition.y);
+		this.ClampToArea ();
 	}
 
 	// Clamp to canvas area
-	public void ClampToArea()
-	{
-		Vector3 pos = _playerRt.localPosition;
+	void ClampToArea () {
+		Vector3 pos = this._playerRt.localPosition;
+		Vector3 minPosition = this._canvasRt.rect.min - this._playerRt.rect.min;
+		Vector3 maxPosition = this._canvasRt.rect.max - this._playerRt.rect.max;
 
-		Vector3 minPosition = _canvasRt.rect.min - _playerRt.rect.min;
-		Vector3 maxPosition = _canvasRt.rect.max - _playerRt.rect.max;
+		pos.x = Mathf.Clamp(this._playerRt.localPosition.x, minPosition.x, maxPosition.x);
+		pos.y = Mathf.Clamp(this._playerRt.localPosition.y, minPosition.y, maxPosition.y);
 
-		pos.x = Mathf.Clamp(_playerRt.localPosition.x, minPosition.x, maxPosition.x);
-		pos.y = Mathf.Clamp(_playerRt.localPosition.y, minPosition.y, maxPosition.y);
+		this._playerRt.localPosition = pos;
+	}
 
-		_playerRt.localPosition = pos;
+	public bool CheckCollisionWithEnemy (GameObject enemy) {
+		// check bullets vs enemy
+		List<GameObject> listDeadBullet = new List<GameObject>();
+		foreach (var bullet in this._listBullets) {
+			if (IsCollision(bullet, enemy)) {
+				var bulletComponent = bullet.GetComponent<Bullet> ();
+				var nenemyComponent = enemy.GetComponent<Enemy> ();
+				nenemyComponent.BeingShot (bulletComponent.GetDamage ());
+				listDeadBullet.Add (bullet);
+				if (nenemyComponent.IsDead()) {
+					break;
+				}
+			}
+		}
+		foreach (var bullet in listDeadBullet) {
+			bullet.SetActive(false);
+			this._listBullets.Remove (bullet);
+		}
+
+		return enemy.GetComponent<Enemy> ().IsDead ();
+	}
+
+	bool IsCollision (GameObject object1, GameObject object2) {
+		var rt1 = object1.GetComponent<RectTransform> ();
+		var rt2 = object2.GetComponent<RectTransform> ();
+		Rect rect1 = new Rect(rt1.localPosition.x, rt1.localPosition.y, rt1.rect.width, rt1.rect.height);
+		Rect rect2 = new Rect(rt2.localPosition.x, rt2.localPosition.y, rt2.rect.width, rt2.rect.height);
+		return rect1.Overlaps(rect2);
 	}
 
 	public void UpdateGO (float dt) {
@@ -115,23 +139,24 @@ public class PlayerManager : MonoBehaviour {
 
 		// update bullets and check dead
 		List<GameObject> listDeadBullet = new List<GameObject>();
-		foreach (var bullet in _listBullets) {
-			bullet.GetComponent<Bullet> ().UpdateGO (dt);
-			if (CheckDeadBullet(bullet)) {
+		foreach (var bullet in this._listBullets) {
+			var bulletComponent = bullet.GetComponent<Bullet> ();
+			bulletComponent.UpdateGO (dt);
+			if (bulletComponent.IsDead()) {
 				listDeadBullet.Add (bullet);
 			}
 		}
 		foreach (var bullet in listDeadBullet) {
 			bullet.SetActive(false);
-			_listBullets.Remove (bullet);
+			this._listBullets.Remove (bullet);
 		}
 	}
 
 	void FireUpdate (float dt) {
-		_timeLapse += dt;
+		this._timeLapse += dt;
 		// fire with interval
-		if (_timeLapse >= _playerStats.BulletSpeed[(int)_playerStats.BulletSpeedLevel]) {
-			switch (_playerStats.FireType) {
+		if (this._timeLapse >= this.GetPlayerStats().BulletSpeed[(int)this.GetPlayerStats().BulletSpeedLevel]) {
+			switch (this.GetPlayerStats().FireType) {
 			case FireStyle.Single:
 				Fire ();
 				break;
@@ -150,17 +175,17 @@ public class PlayerManager : MonoBehaviour {
 		_timeStyleFireChangeLapse += dt;
 		if (_timeStyleFireChangeLapse >= _timeBulletFireChangeInterval) {
 			print ("Change Style Fire");
-			switch (_playerStats.FireType) {
+			switch (this.GetPlayerStats().FireType) {
 			case FireStyle.Single:
-				_playerStats.FireType = FireStyle.Double;
+				this.GetPlayerStats().FireType = FireStyle.Double;
 				break;
 
 			case FireStyle.Double:
-				_playerStats.FireType = FireStyle.Triple;
+				this.GetPlayerStats().FireType = FireStyle.Triple;
 				break;
 
 			case FireStyle.Triple:
-				_playerStats.FireType = FireStyle.Single;
+				this.GetPlayerStats().FireType = FireStyle.Single;
 				break;
 
 			}
@@ -169,14 +194,12 @@ public class PlayerManager : MonoBehaviour {
 		}
 	}
 
-	bool CheckDeadBullet (GameObject bullet) {
-		return bullet.transform.position.y >= _canvasRt.sizeDelta.y;
-	}
-
 	// Update is called once per frame
 	void Update () {
+		
+	}
 
-
-
+	public PlayerStats GetPlayerStats () {
+		return this._playerStats;
 	}
 }

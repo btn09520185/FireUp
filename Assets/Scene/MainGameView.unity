@@ -221,7 +221,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _buttonChangeLevelSpeed: {fileID: 2028865919}
   _player: {fileID: 1070046593}
-  _bulletManager: {fileID: 1070046593}
+  _enemyPrefab: {fileID: 1888688259530428, guid: d396397c393ef44cb80589f0841fa6ac,
+    type: 2}
 --- !u!1 &350299057
 GameObject:
   m_ObjectHideFlags: 0
@@ -386,7 +387,6 @@ MonoBehaviour:
   _bulletPrefab: {fileID: 1026678713041232, guid: 465c71f6362784d9181a2e6c23b6819f,
     type: 2}
   _canvasRt: {fileID: 21272620}
-  _playerStats: {fileID: 0}
 --- !u!114 &1070046598
 MonoBehaviour:
   m_ObjectHideFlags: 0

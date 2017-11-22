@@ -4,15 +4,15 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour, IDragHandler/*, IPointerDownHandler, IPointerUpHandler*/ {
-	PlayerManager _player;
+	PlayerManager _playerManager;
 
 	// Use this for initialization
 	void Start () {
-		_player = GetComponent<PlayerManager> ();
+		this._playerManager = GetComponent<PlayerManager> ();
 	}
 
 	public void OnDrag (PointerEventData eventData) {
-		_player.Move(eventData.delta.x);
+		this._playerManager.Move(eventData.delta.x);
 	}
 		
 	// Update is called once per frame
