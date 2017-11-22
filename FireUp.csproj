@@ -85,6 +85,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Script\Bullet\Bullet.cs" />
+    <Compile Include="Assets\Script\Enemy\Enemy.cs" />
+    <Compile Include="Assets\Script\Enemy\EnemyLine.cs" />
     <Compile Include="Assets\Script\GameController.cs" />
     <Compile Include="Assets\Script\Player\PlayerController.cs" />
     <Compile Include="Assets\Script\Player\PlayerManager.cs" />

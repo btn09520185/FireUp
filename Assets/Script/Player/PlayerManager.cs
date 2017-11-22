@@ -46,41 +46,68 @@ public class PlayerManager : MonoBehaviour {
 			this._poolBullets.Add (ret);
 			ret.transform.SetParent(transform.parent);
 		}
-		return ret;
+        ret.SetActive(true);
+        return ret;
 	}
 
 
 	public IEnumerator Fire () {
 		GameObject bullet = GetFreeBullet ();
 		bullet.GetComponent<Bullet>().InitInfo (0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
-		bullet.SetActive(true);
 		bullet.GetComponent<RectTransform> ().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
 			this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
 		this._changeBulletSide *= -1;
-		this._listBullets.Add (bullet);
-		return null;
+
+        //GameObject bullet2nd = GetFreeBullet();
+        //bullet2nd.GetComponent<Bullet>().InitInfo(0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
+        //bullet2nd.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+        //    this._playerRt.position.y + this._playerRt.sizeDelta.y / 2);
+        this._listBullets.Add (bullet);
+        //this._listBullets.Add(bullet2nd);
+        return null;
 	}
 
 	public IEnumerator DoubleFire () {
-		GameObject bullet = GetFreeBullet ();
-		bullet.GetComponent<Bullet>().InitInfo (0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
-		bullet.SetActive(true);
-		bullet.GetComponent<RectTransform> ().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
-			this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
-		this._changeBulletSide *= -1;
-		this._listBullets.Add (bullet);
+        GameObject bullet1 = GetFreeBullet();
+        bullet1.GetComponent<Bullet>().InitInfo(_changeBulletSide * 1, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
+        bullet1.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+            this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+        this._changeBulletSide *= -1;
+
+        //GameObject bullet2 = GetFreeBullet();
+        //bullet2.GetComponent<Bullet>().InitInfo(_changeBulletSide * 1, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
+        //bullet2.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+        //    this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+        //this._changeBulletSide *= -1;
+
+        this._listBullets.Add (bullet1);
+        //this._listBullets.Add (bullet2);
 		return null;
 	}
 
 	public IEnumerator TripleFire () {
 		GameObject bullet = GetFreeBullet ();
 		bullet.GetComponent<Bullet>().InitInfo (0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
-		bullet.SetActive(true);
 		bullet.GetComponent<RectTransform> ().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
 			this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
-		this._changeBulletSide *= -1;
-		this._listBullets.Add (bullet);
-		return null;
+		//this._changeBulletSide *= -1;
+
+        GameObject bullet1 = GetFreeBullet();
+        bullet1.GetComponent<Bullet>().InitInfo(_changeBulletSide * 3, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
+        bullet1.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+            this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+        this._changeBulletSide *= -1;
+
+        //GameObject bullet2 = GetFreeBullet();
+        //bullet2.GetComponent<Bullet>().InitInfo(_changeBulletSide * 1, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
+        //bullet2.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+        //    this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+        //this._changeBulletSide *= -1;
+
+        this._listBullets.Add(bullet);
+        this._listBullets.Add(bullet1);
+        //this._listBullets.Add(bullet2);
+        return null;
 	}
 
 	public void Move (float deltaX) {
@@ -135,7 +162,7 @@ public class PlayerManager : MonoBehaviour {
 		FireUpdate(dt);
 
 		// Cheat change fire type
-		ChangeStyleFire(dt);
+		//ChangeStyleFire(dt);
 
 		// update bullets and check dead
 		List<GameObject> listDeadBullet = new List<GameObject>();
@@ -157,13 +184,13 @@ public class PlayerManager : MonoBehaviour {
 		// fire with interval
 		if (this._timeLapse >= this.GetPlayerStats().BulletSpeed[(int)this.GetPlayerStats().BulletSpeedLevel]) {
 			switch (this.GetPlayerStats().FireType) {
-			case FireStyle.Single:
+			case FireStyle.SingleLine:
 				Fire ();
 				break;
-			case FireStyle.Double:
-				DoubleFire ();
-				break;
-			case FireStyle.Triple:
+			//case FireStyle.DoubleLine:
+			//	DoubleFire ();
+			//	break;
+			case FireStyle.TripleLine:
 				TripleFire ();
 				break;
 			}
@@ -174,28 +201,32 @@ public class PlayerManager : MonoBehaviour {
 	void ChangeStyleFire (float dt) {
 		_timeStyleFireChangeLapse += dt;
 		if (_timeStyleFireChangeLapse >= _timeBulletFireChangeInterval) {
-			print ("Change Style Fire");
-			switch (this.GetPlayerStats().FireType) {
-			case FireStyle.Single:
-				this.GetPlayerStats().FireType = FireStyle.Double;
-				break;
-
-			case FireStyle.Double:
-				this.GetPlayerStats().FireType = FireStyle.Triple;
-				break;
-
-			case FireStyle.Triple:
-				this.GetPlayerStats().FireType = FireStyle.Single;
-				break;
-
-			}
-
-			_timeStyleFireChangeLapse = 0;
+            ChangeStyleFire ();
+            _timeStyleFireChangeLapse = 0;
 		}
 	}
 
-	// Update is called once per frame
-	void Update () {
+    public void ChangeStyleFire () {
+        print("Change Style Fire");
+        switch (this.GetPlayerStats().FireType)
+        {
+            case FireStyle.SingleLine:
+                this.GetPlayerStats().FireType = FireStyle.TripleLine;
+                break;
+
+            //case FireStyle.DoubleLine:
+            //    this.GetPlayerStats().FireType = FireStyle.TripleLine;
+            //    break;
+
+            case FireStyle.TripleLine:
+                this.GetPlayerStats().FireType = FireStyle.SingleLine;
+                break;
+
+        }
+    }
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
 

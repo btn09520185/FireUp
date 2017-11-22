@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour {
 	public Button _buttonChangeLevelSpeed;
-	public GameObject _player;
+    public Button _buttonChangeStyleFire;
+    public GameObject _player;
 	public GameObject _enemyPrefab;
 	List<GameObject> _listEnemy;
 
@@ -24,17 +25,28 @@ public class GameController : MonoBehaviour {
 		}
 
 		var playerStats = _player.GetComponent<PlayerManager> ().GetPlayerStats();
-		this._buttonChangeLevelSpeed.GetComponentInChildren<Text>().text = "Speed Level " + playerStats.BulletSpeedLevel;
-	}
+        UpdateButtonText(this._buttonChangeStyleFire, "Style Fire: " + playerStats.FireType);
+        UpdateButtonText(this._buttonChangeLevelSpeed, "Speed Level: " + playerStats.BulletSpeedLevel);
+    }
 
 	public void onButtonChangeLevelSpeed () {
 		var playerStats = _player.GetComponent<PlayerManager> ().GetPlayerStats();
 		playerStats.BulletSpeedLevel = (playerStats.BulletSpeedLevel >= playerStats.BulletSpeed.Length - 1) ? 1 : (playerStats.BulletSpeedLevel + 1);
-		this._buttonChangeLevelSpeed.GetComponentInChildren<Text>().text = "Speed Level " + playerStats.BulletSpeedLevel;
-	}
-	
-	// Update is called once per frame
-	void Update () {
+        UpdateButtonText(this._buttonChangeLevelSpeed, "Speed Level: " + playerStats.BulletSpeedLevel);
+    }
+
+    public void onButtonChangeStyleShot () {
+        _player.GetComponent<PlayerManager>().ChangeStyleFire();
+        var playerStats = _player.GetComponent<PlayerManager>().GetPlayerStats();
+        UpdateButtonText(this._buttonChangeStyleFire, "Style Fire: " + playerStats.FireType);
+    }
+
+    void UpdateButtonText (Button go, string str) {
+        go.GetComponentInChildren<Text>().text = str;
+    }
+
+    // Update is called once per frame
+    void Update () {
 		var dt = Time.deltaTime;
 		this._player.GetComponent<PlayerManager> ().UpdateGO(dt);
 
