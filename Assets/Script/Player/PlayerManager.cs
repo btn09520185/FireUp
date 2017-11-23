@@ -57,13 +57,7 @@ public class PlayerManager : MonoBehaviour {
 		bullet.GetComponent<RectTransform> ().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
 			this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
 		this._changeBulletSide *= -1;
-
-        //GameObject bullet2nd = GetFreeBullet();
-        //bullet2nd.GetComponent<Bullet>().InitInfo(0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
-        //bullet2nd.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
-        //    this._playerRt.position.y + this._playerRt.sizeDelta.y / 2);
         this._listBullets.Add (bullet);
-        //this._listBullets.Add(bullet2nd);
         return null;
 	}
 
@@ -73,15 +67,7 @@ public class PlayerManager : MonoBehaviour {
         bullet1.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
             this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
         this._changeBulletSide *= -1;
-
-        //GameObject bullet2 = GetFreeBullet();
-        //bullet2.GetComponent<Bullet>().InitInfo(_changeBulletSide * 1, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
-        //bullet2.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
-        //    this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
-        //this._changeBulletSide *= -1;
-
         this._listBullets.Add (bullet1);
-        //this._listBullets.Add (bullet2);
 		return null;
 	}
 
@@ -90,7 +76,6 @@ public class PlayerManager : MonoBehaviour {
 		bullet.GetComponent<Bullet>().InitInfo (0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
 		bullet.GetComponent<RectTransform> ().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
 			this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
-		//this._changeBulletSide *= -1;
 
         GameObject bullet1 = GetFreeBullet();
         bullet1.GetComponent<Bullet>().InitInfo(_changeBulletSide * 3, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
@@ -98,15 +83,8 @@ public class PlayerManager : MonoBehaviour {
             this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
         this._changeBulletSide *= -1;
 
-        //GameObject bullet2 = GetFreeBullet();
-        //bullet2.GetComponent<Bullet>().InitInfo(_changeBulletSide * 1, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
-        //bullet2.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
-        //    this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
-        //this._changeBulletSide *= -1;
-
         this._listBullets.Add(bullet);
         this._listBullets.Add(bullet1);
-        //this._listBullets.Add(bullet2);
         return null;
 	}
 
@@ -131,15 +109,15 @@ public class PlayerManager : MonoBehaviour {
 		// check bullets vs enemy
 		List<GameObject> listDeadBullet = new List<GameObject>();
 		foreach (var bullet in this._listBullets) {
-			if (IsCollision(bullet, enemy)) {
-				var bulletComponent = bullet.GetComponent<Bullet> ();
-				var nenemyComponent = enemy.GetComponent<Enemy> ();
-				nenemyComponent.BeingShot (bulletComponent.GetDamage ());
-				listDeadBullet.Add (bullet);
-				if (nenemyComponent.IsDead()) {
-					break;
-				}
-			}
+//			if (IsCollision(bullet, enemy)) {
+//				var bulletComponent = bullet.GetComponent<Bullet> ();
+//				var nenemyComponent = enemy.GetComponent<Enemy> ();
+//				nenemyComponent.BeingShot (bulletComponent.GetDamage ());
+//				listDeadBullet.Add (bullet);
+//				if (nenemyComponent.IsDead()) {
+//					break;
+//				}
+//			}
 		}
 		foreach (var bullet in listDeadBullet) {
 			bullet.SetActive(false);

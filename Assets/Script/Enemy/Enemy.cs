@@ -22,20 +22,25 @@ public class Enemy : MonoBehaviour {
 
 	public void BeingShot (int damage) {
 		this._hp = (this._hp - damage <= 0) ? 0 : (this._hp - damage);
+		this.UpdateHpText ();
 		if (this._hp == 0) {
 			this._isDead = true;
+			BeingExplore ();
 		}
-		this.UpdateHpText ();
+	}
+
+	void UpdateHpText () {
+		this._hpText.text = "" + _hp;
+	}
+
+	void BeingExplore () {
+		GameObject.Destroy (gameObject);
 	}
 
 	public bool IsDead() {
 		return this._isDead;
 	}
 
-	void UpdateHpText () {
-		this._hpText.text = "" + _hp;
-	}
-	
 	// Update is called once per frame
 	void Update () {
 		

@@ -12,13 +12,15 @@ public class GameController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+
+		// cheat test 5 enemy
 		this._listEnemy = new List<GameObject>();
 		for (var i = 0; i < 5; i++) {
 			GameObject enemy = Instantiate (_enemyPrefab);
 
 			enemy.transform.position = new Vector2 (Random.Range(0 , 640), Random.Range(600 , 960));
 			Enemy enemyComponent = enemy.GetComponent<Enemy> ();
-			enemyComponent.InitInfo (Random.Range(100 , 1000));
+			enemyComponent.InitInfo (Random.Range(10 , 30));
 			enemy.transform.SetParent (gameObject.transform);
 
 			this._listEnemy.Add (enemy);
@@ -49,12 +51,10 @@ public class GameController : MonoBehaviour {
     void Update () {
 		var dt = Time.deltaTime;
 		this._player.GetComponent<PlayerManager> ().UpdateGO(dt);
-
-		List<GameObject> listEnemyDead = new List<GameObject>();
-		foreach (var enemy in this._listEnemy) {
-			if (this._player.GetComponent<PlayerManager> ().CheckCollisionWithEnemy (enemy)) {
-				listEnemyDead.Add (enemy);
-			}
-		}
 	}
+
+//	void FixedUpdate () {
+//		var dt = Time.deltaTime;
+//		this._player.GetComponent<PlayerManager> ().UpdateGO(dt);
+//	}
 }

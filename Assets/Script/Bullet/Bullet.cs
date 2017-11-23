@@ -19,6 +19,30 @@ public class Bullet : MonoBehaviour {
 		this._damage = damage;
 	}
 
+	void OnCollisionEnter2D(Collision2D collision){
+		print ("Bullet OnCollisionEnter2D");
+		if (collision.gameObject.tag == "Enemy") {
+			var enemy = collision.gameObject.GetComponent<Enemy> ();
+			if (!enemy) {
+				print ("Enemy null");
+				return;
+			}
+			enemy.BeingShot (this.GetDamage());
+			gameObject.SetActive(false);
+		}
+	}
+
+	void OnTriggerEnter2D(Collider2D collider){
+		print ("Bullet OnTriggerEnter2D");
+		var enemy = collider.gameObject.GetComponent<Enemy> ();
+		if (!enemy) {
+			print ("Bullet enemy null");
+			return;
+		}
+		enemy.BeingShot (this.GetDamage());
+		gameObject.SetActive(false);
+	}
+
 	public void UpdateGO (float dt) {
 		var rt = GetComponent<RectTransform> ();
 		rt.position = new Vector2 (rt.position.x + this._speedX, rt.position.y + this._speedY);
