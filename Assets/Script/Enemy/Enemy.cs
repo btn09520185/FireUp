@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class Enemy : MonoBehaviour {
 	Text _hpText;
 	int _hp;
 	bool _isDead;
+	public Action<GameObject> DeadCallBack;
 
 	// Use this for initialization
 	void Start () {
@@ -17,7 +19,6 @@ public class Enemy : MonoBehaviour {
 
 	public void InitInfo (int hp) {
 		this._hp = hp;
-
 	}
 
 	public void BeingShot (int damage) {
@@ -34,6 +35,7 @@ public class Enemy : MonoBehaviour {
 	}
 
 	void BeingExplore () {
+//		DeadCallBack (gameObject);
 		GameObject.Destroy (gameObject);
 	}
 

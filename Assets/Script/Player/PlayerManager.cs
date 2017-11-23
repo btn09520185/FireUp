@@ -145,6 +145,10 @@ public class PlayerManager : MonoBehaviour {
 		// update bullets and check dead
 		List<GameObject> listDeadBullet = new List<GameObject>();
 		foreach (var bullet in this._listBullets) {
+			if (!bullet.activeInHierarchy) {
+				listDeadBullet.Add (bullet);
+				continue;
+			}
 			var bulletComponent = bullet.GetComponent<Bullet> ();
 			bulletComponent.UpdateGO (dt);
 			if (bulletComponent.IsDead()) {

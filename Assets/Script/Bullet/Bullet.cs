@@ -40,6 +40,7 @@ public class Bullet : MonoBehaviour {
 			return;
 		}
 		enemy.BeingShot (this.GetDamage());
+		SetDead (true);
 		gameObject.SetActive(false);
 	}
 
