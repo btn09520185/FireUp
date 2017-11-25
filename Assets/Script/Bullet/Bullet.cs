@@ -49,7 +49,7 @@ public class Bullet : MonoBehaviour {
 		rt.position = new Vector2 (rt.position.x + this._speedX, rt.position.y + this._speedY);
 	
 		var canvasRt = GameObject.Find ("Canvas").GetComponent<RectTransform> ();
-		SetDead (transform.position.y >= canvasRt.sizeDelta.y);
+		SetDead (transform.localPosition.y >= canvasRt.sizeDelta.y);
 	}
 
 	public void SetDead(bool isDead) {

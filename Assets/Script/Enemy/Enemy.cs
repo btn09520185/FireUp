@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using DG.Tweening;
 
 public class Enemy : MonoBehaviour {
 	Text _hpText;
@@ -15,6 +16,11 @@ public class Enemy : MonoBehaviour {
 		print ("Enemy Start");
 		this._hpText = transform.Find ("Text").gameObject.GetComponent<Text>();
 		this.UpdateHpText ();
+
+//		DOTween.Sequence ()
+//			.Append (transform.DOScale (1.5f, 0.3f))
+//			.Append (transform.DOScale (1, 0.3f))
+//			.SetLoops (-1, LoopType.Yoyo);
 	}
 
 	public void InitInfo (int hp) {

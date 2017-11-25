@@ -20,7 +20,7 @@ public class PlayerManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		print ("PlayerManager Start");
-
+		print ("Canvas Size = " + _canvasRt.sizeDelta.x + " , " + _canvasRt.sizeDelta.y);
 	}
 
 	void Awake () {
