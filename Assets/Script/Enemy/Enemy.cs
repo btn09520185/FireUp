@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		print ("Enemy Start");
+		transform.localScale = new Vector2 (1, 1);
 		this._hpText = transform.Find ("Text").gameObject.GetComponent<Text>();
 		this.UpdateHpText ();
 

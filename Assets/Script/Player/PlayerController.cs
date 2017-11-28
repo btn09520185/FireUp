@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PlayerController : MonoBehaviour, IDragHandler/*, IPointerDownHandler, IPointerUpHandler*/ {
+public class PlayerController : MonoBehaviour, IDragHandler {
 	PlayerManager _playerManager;
 
 	// Use this for initialization

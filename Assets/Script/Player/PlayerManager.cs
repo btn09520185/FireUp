@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerManager : MonoBehaviour {
 	public GameObject _bulletPrefab;
@@ -16,11 +17,15 @@ public class PlayerManager : MonoBehaviour {
 	float _timeLapse;
 
 	int _changeBulletSide;
+	int _originalNumEnemyOfLine;
+	float _currentBulletScale;
 
 	// Use this for initialization
 	void Start () {
 		print ("PlayerManager Start");
 		print ("Canvas Size = " + _canvasRt.sizeDelta.x + " , " + _canvasRt.sizeDelta.y);
+		print ("Screen Size = " + Screen.width + " , " + Screen.height);
+
 	}
 
 	void Awake () {
@@ -31,6 +36,8 @@ public class PlayerManager : MonoBehaviour {
 
 		this._timeBulletFireChangeInterval = 5;
 		this._changeBulletSide = -1;
+		this._originalNumEnemyOfLine = 4;
+		this._currentBulletScale = 1;
 	}
 
 	GameObject GetFreeBullet () {
@@ -46,16 +53,27 @@ public class PlayerManager : MonoBehaviour {
 			this._poolBullets.Add (ret);
 			ret.transform.SetParent(transform.parent);
 		}
+		ret.GetComponent<RectTransform> ().localScale = new Vector2 (_currentBulletScale, _currentBulletScale);
         ret.SetActive(true);
         return ret;
+	}
+
+	public void ChangeNumEnemyAction (int newnum) {
+		float scale = (float)this._originalNumEnemyOfLine / (float)newnum;
+		_currentBulletScale = scale;
+		DOTween.Sequence ()
+			.Append (transform.DOScale (scale, 2f));
+		foreach (var bullet in this._listBullets) {
+			bullet.GetComponent<RectTransform> ().localScale = new Vector2 (_currentBulletScale, _currentBulletScale);
+		}
 	}
 
 
 	public IEnumerator Fire () {
 		GameObject bullet = GetFreeBullet ();
 		bullet.GetComponent<Bullet>().InitInfo (0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
-		bullet.GetComponent<RectTransform> ().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
-			this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+		bullet.GetComponent<RectTransform> ().localPosition = new Vector2(this._playerRt.localPosition.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+			this._playerRt.localPosition.y + this._playerRt.sizeDelta.y / 2 - 20);
 		this._changeBulletSide *= -1;
         this._listBullets.Add (bullet);
         return null;
@@ -64,8 +82,8 @@ public class PlayerManager : MonoBehaviour {
 	public IEnumerator DoubleFire () {
         GameObject bullet1 = GetFreeBullet();
         bullet1.GetComponent<Bullet>().InitInfo(_changeBulletSide * 1, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
-        bullet1.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
-            this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+		bullet1.GetComponent<RectTransform>().localPosition = new Vector2(this._playerRt.localPosition.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+			this._playerRt.localPosition.y + this._playerRt.sizeDelta.y / 2 - 20);
         this._changeBulletSide *= -1;
         this._listBullets.Add (bullet1);
 		return null;
@@ -74,13 +92,13 @@ public class PlayerManager : MonoBehaviour {
 	public IEnumerator TripleFire () {
 		GameObject bullet = GetFreeBullet ();
 		bullet.GetComponent<Bullet>().InitInfo (0, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
-		bullet.GetComponent<RectTransform> ().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
-			this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+		bullet.GetComponent<RectTransform> ().localPosition = new Vector2(this._playerRt.localPosition.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+			this._playerRt.localPosition.y + this._playerRt.sizeDelta.y / 2 - 20);
 
         GameObject bullet1 = GetFreeBullet();
         bullet1.GetComponent<Bullet>().InitInfo(_changeBulletSide * 3, this.GetPlayerStats().BulletSpeedMove, this.GetPlayerStats().BulletPower);
-        bullet1.GetComponent<RectTransform>().position = new Vector2(this._playerRt.position.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
-            this._playerRt.position.y + this._playerRt.sizeDelta.y / 2 - 20);
+		bullet1.GetComponent<RectTransform>().localPosition = new Vector2(this._playerRt.localPosition.x + this._changeBulletSide * this.GetPlayerStats().BulletStartRange,
+			this._playerRt.localPosition.y + this._playerRt.sizeDelta.y / 2 - 20);
         this._changeBulletSide *= -1;
 
         this._listBullets.Add(bullet);
@@ -103,36 +121,6 @@ public class PlayerManager : MonoBehaviour {
 		pos.y = Mathf.Clamp(this._playerRt.localPosition.y, minPosition.y, maxPosition.y);
 
 		this._playerRt.localPosition = pos;
-	}
-
-	public bool CheckCollisionWithEnemy (GameObject enemy) {
-		// check bullets vs enemy
-		List<GameObject> listDeadBullet = new List<GameObject>();
-		foreach (var bullet in this._listBullets) {
-//			if (IsCollision(bullet, enemy)) {
-//				var bulletComponent = bullet.GetComponent<Bullet> ();
-//				var nenemyComponent = enemy.GetComponent<Enemy> ();
-//				nenemyComponent.BeingShot (bulletComponent.GetDamage ());
-//				listDeadBullet.Add (bullet);
-//				if (nenemyComponent.IsDead()) {
-//					break;
-//				}
-//			}
-		}
-		foreach (var bullet in listDeadBullet) {
-			bullet.SetActive(false);
-			this._listBullets.Remove (bullet);
-		}
-
-		return enemy.GetComponent<Enemy> ().IsDead ();
-	}
-
-	bool IsCollision (GameObject object1, GameObject object2) {
-		var rt1 = object1.GetComponent<RectTransform> ();
-		var rt2 = object2.GetComponent<RectTransform> ();
-		Rect rect1 = new Rect(rt1.localPosition.x, rt1.localPosition.y, rt1.rect.width, rt1.rect.height);
-		Rect rect2 = new Rect(rt2.localPosition.x, rt2.localPosition.y, rt2.rect.width, rt2.rect.height);
-		return rect1.Overlaps(rect2);
 	}
 
 	public void UpdateGO (float dt) {

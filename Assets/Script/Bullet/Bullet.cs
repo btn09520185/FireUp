@@ -10,7 +10,7 @@ public class Bullet : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		transform.localScale = new Vector2 (1, 1);
 	}
 
 	public void InitInfo (float speedX, float speedY, int damage) {
@@ -45,11 +45,10 @@ public class Bullet : MonoBehaviour {
 	}
 
 	public void UpdateGO (float dt) {
-		var rt = GetComponent<RectTransform> ();
-		rt.position = new Vector2 (rt.position.x + this._speedX, rt.position.y + this._speedY);
+		transform.localPosition = new Vector2 (transform.localPosition.x + this._speedX, transform.localPosition.y + this._speedY);
 	
 		var canvasRt = GameObject.Find ("Canvas").GetComponent<RectTransform> ();
-		SetDead (transform.localPosition.y >= canvasRt.sizeDelta.y);
+		SetDead (transform.position.y >= Screen.height);
 	}
 
 	public void SetDead(bool isDead) {
