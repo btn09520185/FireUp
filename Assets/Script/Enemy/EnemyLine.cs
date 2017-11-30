@@ -11,52 +11,48 @@ public class EnemyLine : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		transform.localScale = new Vector2 (1, 1);
-		_lineDownSpeed = Screen.height / 6;
-		_numEnemy = 4;
-//		ScaleWithNewEnemyNum (5);
+		this.transform.localScale = new Vector2 (1, 1);
+		this._lineDownSpeed = Screen.height / 6;
+		this._numEnemy = 4;
 	}
 
 	public void ChangeNumEnemyAction (int num) {
-		float scale = (float)_numEnemy / (float)num;
-		print ("_numEnemy = " + _numEnemy);
-		print ("num = " + num);
-		print ("ScaleWithNewEnemyNum = " + scale);
+		float scale = (float)this._numEnemy / (float)num;
 		DOTween.Sequence ()
-			.Append (transform.DOScale (scale, 2f));
+			.Append (this.transform.DOScale (scale, 2f));
 	}
 
 	public void CreateEmemyLine (int numEnemy) {
-		_numEnemy = numEnemy;
+		this._numEnemy = numEnemy;
 		var canvasRt = GameObject.Find ("Canvas").GetComponent<RectTransform> ();
-		int enemyWidth = (int)(canvasRt.sizeDelta.x / _numEnemy);
-//		GetComponent<RectTransform>().sizeDelta = new Vector2 (canvasRt.sizeDelta.x, 100);
+		int enemyWidth = (int)(canvasRt.sizeDelta.x / this._numEnemy);
 
 		for (var i = 0; i < _numEnemy; i++) {
-			GameObject enemy = Instantiate (_enemyPrefab);
+			GameObject enemy = Instantiate (this._enemyPrefab);
 			int index = i;
 
 			Enemy enemyComponent = enemy.GetComponent<Enemy> ();
 			enemyComponent.InitInfo (Random.Range(10 , 30));
-//			enemyComponent.DeadCallBack += EnemyDeadCallback;
 			enemy.transform.SetParent (gameObject.transform);
 			enemy.transform.localPosition = new Vector2 ((index * enemyWidth) + enemyWidth / 2 - canvasRt.sizeDelta.x / 2, 0);
-			enemy.GetComponent<RectTransform> ().sizeDelta = new Vector2 (enemyWidth, enemy.GetComponent<RectTransform> ().sizeDelta.y);
+
+			RectTransform enemyRt = enemy.GetComponent<RectTransform> ();
+			BoxCollider2D enemyCollider = enemy.GetComponent<BoxCollider2D> ();
+			enemyCollider.size = new Vector2 (enemyWidth, enemy.GetComponent<RectTransform> ().sizeDelta.y);
+			enemyRt.sizeDelta = new Vector2 (enemyWidth, enemy.GetComponent<RectTransform> ().sizeDelta.y);
 		}
 	}
 	
 	public void UpdateGO (float dt) {
-		transform.localPosition = new Vector2 (transform.localPosition.x, transform.localPosition.y - _lineDownSpeed * dt);
-
-		var canvasRt = GameObject.Find ("Canvas").GetComponent<RectTransform> ();
-		SetDead (transform.position.y < 0);
+		this.transform.localPosition = new Vector2 (this.transform.localPosition.x, this.transform.localPosition.y - this._lineDownSpeed * dt);
+		this.SetDead (this.transform.position.y < 0);
 	}
 
 	void SetDead(bool isDead) {
-		_isDead = isDead;
+		this._isDead = isDead;
 	}
 
 	public bool IsDead() {
-		return _isDead;
+		return this._isDead;
 	}
 }

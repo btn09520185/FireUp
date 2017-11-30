@@ -10,45 +10,18 @@ public class Bullet : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		transform.localScale = new Vector2 (1, 1);
+		this.transform.localScale = new Vector2 (1, 1);
 	}
 
-	public void InitInfo (float speedX, float speedY, int damage) {
-		this._speedX = speedX;
-		this._speedY = speedY;
+	public void InitInfo (Vector2 speed, int damage) {
+		this._speedX = speed.x * 60;
+		this._speedY = speed.y * 60;
 		this._damage = damage;
 	}
 
-	void OnCollisionEnter2D(Collision2D collision){
-		print ("Bullet OnCollisionEnter2D");
-		if (collision.gameObject.tag == "Enemy") {
-			var enemy = collision.gameObject.GetComponent<Enemy> ();
-			if (!enemy) {
-				print ("Enemy null");
-				return;
-			}
-			enemy.BeingShot (this.GetDamage());
-			gameObject.SetActive(false);
-		}
-	}
-
-	void OnTriggerEnter2D(Collider2D collider){
-		print ("Bullet OnTriggerEnter2D");
-		var enemy = collider.gameObject.GetComponent<Enemy> ();
-		if (!enemy) {
-			print ("Bullet enemy null");
-			return;
-		}
-		enemy.BeingShot (this.GetDamage());
-		SetDead (true);
-		gameObject.SetActive(false);
-	}
-
 	public void UpdateGO (float dt) {
-		transform.localPosition = new Vector2 (transform.localPosition.x + this._speedX, transform.localPosition.y + this._speedY);
-	
-		var canvasRt = GameObject.Find ("Canvas").GetComponent<RectTransform> ();
-		SetDead (transform.position.y >= Screen.height);
+		this.transform.localPosition = new Vector2 (this.transform.localPosition.x + this._speedX * dt, this.transform.localPosition.y + this._speedY * dt);
+		this.SetDead (this.transform.position.y >= Screen.height);
 	}
 
 	public void SetDead(bool isDead) {
